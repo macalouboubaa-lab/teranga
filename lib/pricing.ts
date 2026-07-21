@@ -1,3 +1,15 @@
-export function calculatePrice(distanceKm: number) 
-{ const BASE = 500 const PER_KM = 350 const MIN = 1000 const total = BASE + distanceKm * PER_KM return Math.max(Math.round(total / 50) * 50, MIN) 
-} export function formatFCFA(amount: number) { return new Intl.NumberFormat("fr-SN", { style: "currency", currency: "XOF", minimumFractionDigits: 0 }).format(amount) }
+export function calculatePrice(distanceKm: number): number {
+  const BASE = 500
+  const PER_KM = 350
+  const MIN = 1000
+  const total = BASE + distanceKm * PER_KM
+  return Math.max(Math.round(total / 50) * 50, MIN)
+}
+
+export function formatFCFA(amount: number): string {
+  return new Intl.NumberFormat("fr-SN", {
+    style: "currency",
+    currency: "XOF",
+    minimumFractionDigits: 0
+  }).format(amount)
+}
