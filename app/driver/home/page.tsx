@@ -1,29 +1,43 @@
-/*Sections à garder pour le chauffeur
-Garder :
-✅
-Le toggle En ligne / Hors ligne
-UPDATE users SET is_online = true/false
-✅
-Les stats du jour (revenus, courses)
-SELECT depuis rides WHERE driver_id = user.id
-✅
-La notification de nouvelle course + timer 30s
-Supabase Realtime → écoute les rides "pending"
-✅
-Les boutons Accepter / Refuser
-UPDATE rides SET driver_id, status = "accepted"
-✅
-L'historique des courses
-Ne pas mettre sur cette page :
-❌
-Le champ destination → page client uniquement
-❌
-Le calcul du prix → fait côté client
-❌
-Le bouton "Commander" → page client uniquement*/
+"use client";
 
-"use client" import { useState, useEffect } from "react" 
-import { useRouter } from "next/navigation" import { supabase } from "@/lib/supabaseClient" 
-import { formatFCFA } from "@/lib/pricing" 
-// PAS de Mapbox ici → carte optionnelle uniquement 
-// PAS de calculatePrice → le chauffeur voit juste le prix
+import { useEffect, useState } from "react";
+import { formatFCFA } from "@/lib/pricing";
+
+export default function DriverHomePage() {
+  const [isOnline, setIsOnline] = useState(false);
+  const [earnings, setEarnings] = useState(125000);
+
+  useEffect(() => {
+    setEarnings(125000);
+  }, []);
+
+  return (
+    <main className="min-h-screen bg-gray-950 p-6 text-white">
+      <div className="mx-auto max-w-5xl rounded-2xl border border-gray-800 bg-gray-900 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-green-400">Accueil chauffeur</h1>
+            <p className="mt-2 text-gray-400">Gérez votre disponibilité et vos revenus.</p>
+          </div>
+          <button
+            onClick={() => setIsOnline((value) => !value)}
+            className={`rounded-full px-4 py-2 font-semibold ${isOnline ? "bg-green-500 text-black" : "bg-gray-800 text-white"}`}
+          >
+            {isOnline ? "En ligne" : "Hors ligne"}
+          </button>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="rounded-xl border border-gray-800 bg-gray-950 p-4">
+            <p className="text-sm text-gray-400">Revenus du jour</p>
+            <p className="mt-2 text-3xl font-bold text-green-400">{formatFCFA(earnings)}</p>
+          </div>
+          <div className="rounded-xl border border-gray-800 bg-gray-950 p-4">
+            <p className="text-sm text-gray-400">Courses en attente</p>
+            <p className="mt-2 text-3xl font-bold">3</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
