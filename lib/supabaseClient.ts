@@ -5,13 +5,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 */
 
 const supabaseUrl = "https://mcistfdbrlbbkzjvsreb.supabase.co"!;
-const supabaseAnonKey = "sb_publishable_p3qAAaIIBNQpCxBgy-RGnA_J-sOMxPd"!;
-
-
-// MES CLES 
-//NEXT_PUBLIC_SUPABASE_URL=https://mcistfdbrlbbkzjvsreb.supabase.co
-//NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_p3qAAaIIBNQpCxBgy-RGnA_J-sOMxPd
-	
+const supabaseAnonKey = "sb_publishable_p3qAAaIIBNQpCxBgy-RGnA_J-sOMxPd"!;	
 
 
 //j'enleve ma verification pour le moment 
