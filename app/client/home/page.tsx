@@ -1,42 +1,53 @@
+// app/client/home/page.tsx
 "use client";
-
-import { useEffect, useState } from "react";
-import { calculatePrice, formatFCFA } from "@/lib/pricing";
+import { useState } from "react";
+import MapWithRoute from "@/components/MapWithRoute";
 
 export default function ClientHomePage() {
-  const [distance, setDistance] = useState(6);
-  const [price, setPrice] = useState(0);
+  const [distance, setDistance] = useState<number | null>(null);
+  const [price, setPrice] = useState<number | null>(null);
 
-  useEffect(() => {
-    setPrice(calculatePrice(distance));
-  }, [distance]);
+  const handleDistanceCalculated = (dist: number, prix: number) => {
+    setDistance(dist);
+    setPrice(prix);
+  };
 
   return (
-    <main className="min-h-screen bg-gray-950 p-6 text-white">
-      <div className="mx-auto max-w-5xl rounded-2xl border border-gray-800 bg-gray-900 p-6">
-        <h1 className="text-2xl font-bold text-green-400">Accueil client</h1>
-        <p className="mt-2 text-gray-400">Préparez votre trajet et estimez le prix.</p>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl border border-gray-800 bg-gray-950 p-4">
-            <label className="mb-2 block text-sm text-gray-400">Distance estimée (km)</label>
-            <input
-              type="range"
-              min="1"
-              max="20"
-              value={distance}
-              onChange={(e) => setDistance(Number(e.target.value))}
-              className="w-full"
-            />
-            <p className="mt-3 text-lg font-semibold">{distance} km</p>
+    <div className="min-h-screen bg-gray-50 pt-20">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* En-tête */}
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 className="text-2xl font-bold text-gray-800">
+              🚗 Préparez votre trajet
+            </h1>
+            <p className="text-gray-600">
+              Cliquez sur la carte pour sélectionner votre point de départ et d'arrivée
+            </p>
           </div>
 
-          <div className="rounded-xl border border-gray-800 bg-gray-950 p-4">
-            <p className="text-sm text-gray-400">Prix estimé</p>
-            <p className="mt-2 text-3xl font-bold text-green-400">{formatFCFA(price)}</p>
-          </div>
+          {/* Carte */}
+          <MapWithRoute onDistanceCalculated={handleDistanceCalculated} />
+
+          {/* Résumé du trajet */}
+          {distance && price && (
+            <div className="mt-6 bg-white rounded-lg shadow-lg p-6 grid grid-cols-2 gap-4">
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-gray-600">Distance estimée</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {distance.toFixed(1)} km
+                </p>
+              </div>
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-600">Prix estimé</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {price.toLocaleString()} FCFA
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
