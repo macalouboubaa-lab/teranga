@@ -1,7 +1,8 @@
 // app/components/MapWithRoute.tsx
 "use client";
 import { useState, useRef, useEffect } from "react";
-import Map, { Marker, Popup, NavigationControl } from "react-map-gl";
+import InteractiveMap, { Marker, Popup, NavigationControl } from "react-map-gl";
+import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 // Votre clé Mapbox (à remplacer par la vôtre)
@@ -51,7 +52,7 @@ export default function MapWithRoute({ onDistanceCalculated }: MapWithRouteProps
 
   // Gérer le clic sur la carte
   const handleMapClick = (event: any) => {
-    const { lng, lat } = event.lngLat;
+    const [lng, lat] = event.lngLat;
     const point = { longitude: lng, latitude: lat };
 
     if (!startPoint) {
@@ -93,29 +94,33 @@ export default function MapWithRoute({ onDistanceCalculated }: MapWithRouteProps
   // Ajuster la vue pour montrer les deux points
   useEffect(() => {
     if (startPoint && endPoint && mapRef.current) {
-      const bounds: any = new mapboxgl.LngLatBounds();
+      const bounds = new mapboxgl.LngLatBounds();
       bounds.extend([startPoint.longitude, startPoint.latitude]);
       bounds.extend([endPoint.longitude, endPoint.latitude]);
-      mapRef.current.fitBounds(bounds, { padding: 50, duration: 1000 });
+      mapRef.current.getMap().fitBounds(bounds, { padding: 50, duration: 1000 });
     }
   }, [startPoint, endPoint]);
 
   return (
     <div className="relative w-full h-[500px] rounded-lg overflow-hidden shadow-lg">
-      <Map
+      <InteractiveMap
         ref={mapRef}
-        mapboxAccessToken={MAPBOX_TOKEN}
+        mapboxApiAccessToken={MAPBOX_TOKEN}
+        width="100%"
+        height="100%"
         {...viewState}
-        onMove={evt => setViewState(evt.viewState)}
+        onViewStateChange={(evt: any) => setViewState(evt.viewState)}
         onClick={handleMapClick}
         mapStyle="mapbox://styles/mapbox/streets-v12"
         className="w-full h-full"
       >
-        <NavigationControl position="top-right" />
+        <div className="absolute top-4 right-4 z-10">
+          <NavigationControl showCompass showZoom />
+        </div>
         
         {/* Marqueur de départ */}
         {startPoint && (
-          <Marker longitude={startPoint.longitude} latitude={startPoint.latitude} color="#22c55e">
+          <Marker longitude={startPoint.longitude} latitude={startPoint.latitude}>
             <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
               Départ
             </div>
@@ -124,7 +129,7 @@ export default function MapWithRoute({ onDistanceCalculated }: MapWithRouteProps
         
         {/* Marqueur d'arrivée */}
         {endPoint && (
-          <Marker longitude={endPoint.longitude} latitude={endPoint.latitude} color="#ef4444">
+          <Marker longitude={endPoint.longitude} latitude={endPoint.latitude}>
             <div className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
               Arrivée
             </div>
@@ -162,7 +167,7 @@ export default function MapWithRoute({ onDistanceCalculated }: MapWithRouteProps
             {startPoint && endPoint && "✅ Trajet calculé ! Cliquez sur 'Réinitialiser' pour recommencer"}
           </p>
         </div>
-      </Map>
+      </InteractiveMap>
     </div>
   );
 }

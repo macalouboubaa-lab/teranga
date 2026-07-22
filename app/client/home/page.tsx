@@ -1,7 +1,7 @@
 // app/client/home/page.tsx
 "use client";
 import { useState } from "react";
-import MapWithRoute from "@/components/MapWithRoute";
+import MapWithRoute from "../../components/MapWithRoute";
 
 export default function ClientHomePage() {
   const [distance, setDistance] = useState<number | null>(null);
