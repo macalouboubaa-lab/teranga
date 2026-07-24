@@ -15,6 +15,9 @@ import "./globals.css";
 // Import du composant Navbar (menu de navigation fixe)
 import Navbar from "@/components/Navbar";
 
+console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log("Mapbox Token:", process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
+
 // ============================================================
 // CONFIGURATION DES POLICES
 // ============================================================

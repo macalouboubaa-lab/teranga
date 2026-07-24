@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { formatFCFA } from "@/lib/pricing";
 
+console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log("Mapbox Token:", process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
+
 export default function DriverHomePage() {
   const [isOnline, setIsOnline] = useState(false);
   const [earnings, setEarnings] = useState(125000);

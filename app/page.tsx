@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 
+console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log("Mapbox Token:", process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
+
 export default function Home() {
   const router = useRouter();
   const [pickup, setPickup] = useState("");

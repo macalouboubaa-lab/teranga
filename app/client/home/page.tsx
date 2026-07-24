@@ -3,6 +3,9 @@
 import { useState } from "react";
 import MapWithRoute from "../../components/MapWithRoute";
 
+console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log("Mapbox Token:", process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
+
 export default function ClientHomePage() {
   const [distance, setDistance] = useState<number | null>(null);
   const [price, setPrice] = useState<number | null>(null);
