@@ -5,9 +5,14 @@ import InteractiveMap, { Marker, Popup, NavigationControl } from "react-map-gl";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-// Votre clé Mapbox (à remplacer par la vôtre)
-const MAPBOX_TOKEN = "votre_token_mapbox_ici";
+//  Lire le token depuis les variables d'environnement
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
+
+// ⚠️  vérification pour éviter une erreur si la variable est absente
+if (!MAPBOX_TOKEN) {
+  console.error("❌ Mapbox token is missing. Please set NEXT_PUBLIC_MAPBOX_TOKEN in your environment variables.");
+}
 interface Point {
   longitude: number;
   latitude: number;
