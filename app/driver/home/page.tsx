@@ -1,15 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { formatFCFA } from "@/lib/pricing";
 
 export default function DriverHomePage() {
   const [isOnline, setIsOnline] = useState(false);
-  const [earnings, setEarnings] = useState(125000);
-
-  useEffect(() => {
-    setEarnings(125000);
-  }, []);
+  const earnings = 125000;
 
   return (
     <main className="min-h-screen bg-gray-950 p-6 text-white">

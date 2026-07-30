@@ -1,15 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { calculatePrice, formatFCFA } from "@/lib/pricing";
 
 export default function ClientHomePage() {
   const [distance, setDistance] = useState(6);
-  const [price, setPrice] = useState(0);
-
-  useEffect(() => {
-    setPrice(calculatePrice(distance));
-  }, [distance]);
+  const price = calculatePrice(distance);
 
   return (
     <main className="min-h-screen bg-gray-950 p-6 text-white">
