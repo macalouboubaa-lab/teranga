@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import AuthGate from "@/app/components/AuthGate";
 import { formatFCFA } from "@/lib/pricing";
 import { acceptRide, getSupabaseClient, listPendingRides } from "@/lib/supabaseClient";
 
@@ -72,6 +73,7 @@ export default function DriverHomePage() {
   }
 
   return (
+    <AuthGate expectedRole="driver">
     <main className="min-h-screen bg-gray-950 p-6 text-white">
       <div className="mx-auto max-w-6xl rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl shadow-black/30">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -146,5 +148,6 @@ export default function DriverHomePage() {
         </div>
       </div>
     </main>
+    </AuthGate>
   );
 }

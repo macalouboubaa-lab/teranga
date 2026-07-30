@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AuthGate from "@/app/components/AuthGate";
 import { calculatePrice, formatFCFA, type RideType } from "@/lib/pricing";
 import { createRide, getSupabaseClient } from "@/lib/supabaseClient";
 
@@ -59,6 +60,7 @@ export default function ClientHomePage() {
   }
 
   return (
+    <AuthGate expectedRole="client">
     <main className="min-h-screen bg-gray-950 p-6 text-white">
       <div className="mx-auto max-w-6xl rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl shadow-black/30">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
@@ -167,5 +169,6 @@ export default function ClientHomePage() {
         </div>
       </div>
     </main>
+    </AuthGate>
   );
 }

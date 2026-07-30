@@ -37,7 +37,7 @@ export default function LoginPage() {
       }
 
       const role = data.user?.user_metadata?.role;
-      router.push(role === "driver" ? "/driver/home" : "/client/home");
+      router.replace(role === "driver" ? "/driver/home" : "/client/home");
     } catch (err) {
       setError("Une erreur inattendue est survenue. Veuillez réessayer.");
       console.error(err);
