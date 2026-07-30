@@ -6,11 +6,28 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 export function getSupabaseClient() {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      "Supabase n'est pas configuré. Définis NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY dans .env.local."
+      "Supabase n'est pas configuré. Vérifie NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY dans l'environnement ou Vercel."
     );
   }
 
-  return createClient(supabaseUrl, supabaseAnonKey);
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+}
+
+export function getSupabaseConfigIssue() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    return "NEXT_PUBLIC_SUPABASE_URL est manquant.";
+  }
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return "NEXT_PUBLIC_SUPABASE_ANON_KEY est manquant.";
+  }
+
+  return null;
 }
 
 export async function ensureUserProfile(supabase: ReturnType<typeof getSupabaseClient>, userId: string, profile: { email: string; phone?: string; full_name?: string; role?: string }) {

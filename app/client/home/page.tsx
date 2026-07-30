@@ -20,8 +20,8 @@ export default function ClientHomePage() {
   useEffect(() => {
     async function loadSession() {
       const supabase = getSupabaseClient();
-      const { data } = await supabase.auth.getUser();
-      setCurrentUserId(data.user?.id ?? null);
+      const { data: sessionData } = await supabase.auth.getSession();
+      setCurrentUserId(sessionData.session?.user?.id ?? null);
     }
 
     void loadSession();

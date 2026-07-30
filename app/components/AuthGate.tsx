@@ -17,10 +17,11 @@ export default function AuthGate({
   useEffect(() => {
     async function verifySession() {
       const supabase = getSupabaseClient();
-      const { data } = await supabase.auth.getUser();
-      const role = data.user?.user_metadata?.role as string | undefined;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData.session?.user;
+      const role = user?.user_metadata?.role as string | undefined;
 
-      if (!data.user) {
+      if (!user) {
         router.replace("/auth/login");
         return;
       }

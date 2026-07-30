@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSupabaseClient } from "@/lib/supabaseClient";
+import { getSupabaseClient, getSupabaseConfigIssue } from "@/lib/supabaseClient";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -35,6 +35,13 @@ export default function RegisterPage() {
     }
 
     try {
+      const configIssue = getSupabaseConfigIssue();
+      if (configIssue) {
+        setError(`Configuration Supabase manquante : ${configIssue}`);
+        setLoading(false);
+        return;
+      }
+
       const supabase = getSupabaseClient();
 
       const { data, error: authError } = await supabase.auth.signUp({
@@ -49,7 +56,7 @@ export default function RegisterPage() {
       });
 
       if (authError) {
-        setError(authError.message);
+        setError(`Inscription impossible : ${authError.message}`);
         setLoading(false);
         return;
       }
@@ -64,7 +71,7 @@ export default function RegisterPage() {
         });
 
         if (profileError) {
-          setError("Compte créé, mais le profil n’a pas pu être enregistré. Contactez l’assistance.");
+          setError(`Compte créé, mais le profil n’a pas pu être enregistré : ${profileError.message}`);
           setLoading(false);
           return;
         }
@@ -72,7 +79,8 @@ export default function RegisterPage() {
 
       router.replace(role === "driver" ? "/driver/home" : "/client/home");
     } catch (err) {
-      setError("Une erreur inattendue est survenue. Veuillez réessayer.");
+      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      setError(`Erreur d’inscription : ${message}`);
       console.error(err);
     } finally {
       setLoading(false);
