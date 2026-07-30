@@ -1,3 +1,4 @@
+# Agent: KAGEBOT
 # AGENTS.md - Instructions pour les agents IA
 
 Ce fichier contient les instructions pour les agents IA qui travaillent sur le projet **TERANGA**.
