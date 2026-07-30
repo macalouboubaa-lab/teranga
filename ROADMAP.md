@@ -1,6 +1,7 @@
 # Roadmap TERANGA
 
 ## 1. Corrections urgentes
+## 🔴 Priorité 1 - Critique (Urgent)
 - Remplacer les clés Supabase hardcodées par des variables d’environnement sécurisées.
 - Sécuriser les flux d’authentification et la création de profils utilisateur.
 - Ajouter une vraie page d’accueil orientée produit plutôt qu’un simple test de connexion.
@@ -8,12 +9,14 @@
 - Définir la structure de base de la base de données Supabase (tables users, drivers, rides, payments).
 
 ## 2. Améliorations à court terme
+## 🟡 Priorité 2 - Important
 - Ajouter un profil utilisateur et chauffeur complet.
 - Intégrer une recherche de destination avec calcul de distance/prix.
 - Implémenter une carte Mapbox fonctionnelle avec géolocalisation.
 - Ajouter un historique de courses et un tableau de bord personnel.
 - Introduire un système de notifications simples.
 
+## 🟢 Priorité 3 - Améliorations
 ## 3. Nouvelles fonctionnalités à moyen terme
 - Développer le flux de réservation de course depuis le client.
 - Ajouter l’acceptation/refus d’une course côté chauffeur.

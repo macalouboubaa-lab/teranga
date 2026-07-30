@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatFCFA } from "@/lib/pricing";
+import { acceptRide, getSupabaseClient, listPendingRides } from "@/lib/supabaseClient";
 
 type RideRequest = {
   id: number;
@@ -11,22 +12,63 @@ type RideRequest = {
   eta: string;
 };
 
-const initialRequests: RideRequest[] = [
-  { id: 1, pickup: "Mermoz", destination: "Plateau", fare: 6800, eta: "4 min" },
-  { id: 2, pickup: "Hann", destination: "Fass", fare: 5400, eta: "8 min" },
-  { id: 3, pickup: "Liberté 6", destination: "Médina", fare: 7600, eta: "12 min" },
-];
+const initialRequests: RideRequest[] = [];
 
 export default function DriverHomePage() {
   const [isOnline, setIsOnline] = useState(false);
-  const [requests, setRequests] = useState(initialRequests);
+  const [requests, setRequests] = useState<RideRequest[]>(initialRequests);
   const [acceptedRide, setAcceptedRide] = useState<RideRequest | null>(null);
+  const [driverId, setDriverId] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
 
   const earnings = useMemo(() => 125000 + (acceptedRide ? acceptedRide.fare : 0), [acceptedRide]);
 
-  function acceptRequest(request: RideRequest) {
-    setAcceptedRide(request);
-    setRequests((current) => current.filter((item) => item.id !== request.id));
+  useEffect(() => {
+    async function loadSession() {
+      const supabase = getSupabaseClient();
+      const { data } = await supabase.auth.getUser();
+      setDriverId(data.user?.id ?? null);
+    }
+
+    void loadSession();
+  }, []);
+
+  useEffect(() => {
+    async function loadPendingRides() {
+      const supabase = getSupabaseClient();
+      const { data, error } = await listPendingRides(supabase);
+
+      if (!error && data) {
+        const mapped: RideRequest[] = data.map((ride) => ({
+          id: Number(ride.id.slice(0, 8).replace(/[^0-9]/g, "")) || Math.floor(Math.random() * 1000),
+          pickup: ride.pickup_address ?? "Adresse inconnue",
+          destination: ride.dropoff_address ?? "Destination inconnue",
+          fare: Number(ride.price_cfa ?? 0),
+          eta: "À l’instant",
+        }));
+        setRequests(mapped);
+      }
+    }
+
+    void loadPendingRides();
+  }, []);
+
+  async function acceptRequest(request: RideRequest) {
+    if (!driverId) {
+      setMessage("Veuillez vous connecter pour accepter une course.");
+      return;
+    }
+
+    const supabase = getSupabaseClient();
+    const { error } = await acceptRide(supabase, request.id.toString(), driverId);
+
+    if (!error) {
+      setAcceptedRide(request);
+      setRequests((current) => current.filter((item) => item.id !== request.id));
+      setMessage("Course acceptée avec succès.");
+    } else {
+      setMessage("L’acceptation de la course a échoué.");
+    }
   }
 
   return (
@@ -90,6 +132,7 @@ export default function DriverHomePage() {
 
           <div className="rounded-2xl border border-gray-800 bg-gray-950 p-5">
             <h2 className="text-lg font-semibold text-green-400">Course active</h2>
+            {message ? <p className="mt-4 text-sm text-green-300">{message}</p> : null}
             {acceptedRide ? (
               <div className="mt-4 rounded-xl border border-green-500/30 bg-green-500/10 p-4">
                 <p className="text-sm text-green-300">Course acceptée</p>

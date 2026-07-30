@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -18,35 +18,65 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
 
-    const { data, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          role,
-          full_name: fullName,
-        },
-      },
-    });
+    const trimmedFullName = fullName.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPhone = phone.trim();
 
-    if (authError) {
-      setError(authError.message);
+    if (!trimmedFullName || !trimmedEmail || !trimmedPhone || !password) {
+      setError("Veuillez remplir tous les champs avant de créer votre compte.");
       setLoading(false);
       return;
     }
 
-    if (data.user) {
-      await supabase.from("users").insert({
-        id: data.user.id,
-        email,
-        phone,
-        full_name: fullName,
-        role,
-      });
-      router.push(role === "driver" ? "/driver/home" : "/client/home");
+    if (password.length < 6) {
+      setError("Le mot de passe doit contenir au moins 6 caractères.");
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
+    try {
+      const supabase = getSupabaseClient();
+
+      const { data, error: authError } = await supabase.auth.signUp({
+        email: trimmedEmail,
+        password,
+        options: {
+          data: {
+            role,
+            full_name: trimmedFullName,
+          },
+        },
+      });
+
+      if (authError) {
+        setError(authError.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        const { error: profileError } = await supabase.from("users").insert({
+          id: data.user.id,
+          email: trimmedEmail,
+          phone: trimmedPhone,
+          full_name: trimmedFullName,
+          role,
+        });
+
+        if (profileError) {
+          setError("Compte créé, mais le profil n’a pas pu être enregistré. Contactez l’assistance.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      router.push(role === "driver" ? "/driver/home" : "/client/home");
+    } catch (err) {
+      setError("Une erreur inattendue est survenue. Veuillez réessayer.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

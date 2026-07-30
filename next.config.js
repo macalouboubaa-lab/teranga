@@ -17,7 +17,4 @@ const nextConfig = {
   },
 };
 
-console.log("next.config.js - URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-console.log("next.config.js - KEY:", !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-
 module.exports = nextConfig;
