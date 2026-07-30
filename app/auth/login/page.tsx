@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { getSupabaseClient } from "@/lib/supabaseClient";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,20 +16,34 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (authError) {
-      setError("Email ou mot de passe incorrect");
+    if (!email.trim() || !password) {
+      setError("Veuillez saisir votre email et votre mot de passe.");
       setLoading(false);
       return;
     }
 
-    const role = data.user?.user_metadata?.role;
-    router.push(role === "driver" ? "/driver/home" : "/client/home");
-    setLoading(false);
+    try {
+      const supabase = getSupabaseClient();
+
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+
+      if (authError) {
+        setError("Email ou mot de passe incorrect");
+        setLoading(false);
+        return;
+      }
+
+      const role = data.user?.user_metadata?.role;
+      router.push(role === "driver" ? "/driver/home" : "/client/home");
+    } catch (err) {
+      setError("Une erreur inattendue est survenue. Veuillez réessayer.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
