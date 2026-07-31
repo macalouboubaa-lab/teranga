@@ -71,7 +71,11 @@ export default function RegisterPage() {
         });
 
         if (profileError) {
-          setError(`Compte créé, mais le profil n’a pas pu être enregistré : ${profileError.message}`);
+          const hint = profileError.message.includes("relation") && profileError.message.includes("does not exist")
+            ? "Le schéma Supabase n’est pas encore appliqué. Exécutez SUPABASE_SCHEMA.sql dans l’éditeur SQL de Supabase."
+            : "Vérifiez les politiques RLS sur public.users.";
+
+          setError(`Compte créé, mais le profil n’a pas pu être enregistré : ${profileError.message}. ${hint}`);
           setLoading(false);
           return;
         }

@@ -3,6 +3,18 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+export function getSupabaseConfigIssue() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    return "NEXT_PUBLIC_SUPABASE_URL est manquant.";
+  }
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return "NEXT_PUBLIC_SUPABASE_ANON_KEY est manquant.";
+  }
+
+  return null;
+}
+
 export function getSupabaseClient() {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
@@ -18,13 +30,19 @@ export function getSupabaseClient() {
   });
 }
 
-export function getSupabaseConfigIssue() {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return "NEXT_PUBLIC_SUPABASE_URL est manquant.";
+export function getSupabaseErrorHint(error: { message?: string } | null | undefined) {
+  const message = error?.message ?? "";
+
+  if (message.includes("relation") && message.includes("does not exist")) {
+    return "La table public.users n’existe pas encore dans votre projet Supabase. Exécutez le SQL de SUPABASE_SCHEMA.sql dans l’éditeur SQL de Supabase.";
   }
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return "NEXT_PUBLIC_SUPABASE_ANON_KEY est manquant.";
+  if (message.includes("row-level security") || message.includes("policy")) {
+    return "Les politiques RLS empêchent l’opération. Vérifiez les politiques sur public.users et public.rides.";
+  }
+
+  if (message.includes("JWT") || message.includes("token")) {
+    return "Le jeton d’authentification est invalide ou expiré. Reconnectez-vous puis réessayez.";
   }
 
   return null;
@@ -77,4 +95,32 @@ export async function acceptRide(supabase: ReturnType<typeof getSupabaseClient>,
     .single();
 
   return { data, error };
+}
+
+export async function checkSupabaseSchema() {
+  try {
+    const supabase = getSupabaseClient();
+    const res: any = { users: null, rides: null, ok: false, errors: [] };
+
+    const { data: udata, error: uerr } = await supabase.from("users").select("id").limit(1);
+    if (uerr) {
+      res.users = { ok: false, error: uerr.message, hint: getSupabaseErrorHint(uerr) };
+      res.errors.push({ table: "users", error: uerr.message });
+    } else {
+      res.users = { ok: true, count: (udata ?? []).length };
+    }
+
+    const { data: rdata, error: rerr } = await supabase.from("rides").select("id").limit(1);
+    if (rerr) {
+      res.rides = { ok: false, error: rerr.message, hint: getSupabaseErrorHint(rerr) };
+      res.errors.push({ table: "rides", error: rerr.message });
+    } else {
+      res.rides = { ok: true, count: (rdata ?? []).length };
+    }
+
+    res.ok = res.errors.length === 0;
+    return res;
+  } catch (err: any) {
+    return { ok: false, errors: [{ error: err?.message ?? String(err) }], hint: getSupabaseConfigIssue?.() ?? null };
+  }
 }

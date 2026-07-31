@@ -47,7 +47,8 @@ export default function ClientHomePage() {
       });
 
       if (error) {
-        setStatusMessage("La réservation n’a pas pu être enregistrée.");
+        const detail = error.message ? ` ${error.message}` : "";
+        setStatusMessage(`La réservation n’a pas pu être enregistrée.${detail}`);
       } else {
         setStatusMessage("Course réservée avec succès. Un chauffeur sera bientôt notifié.");
       }

@@ -25,6 +25,13 @@ export default function LoginPage() {
     }
 
     try {
+      const configIssue = getSupabaseConfigIssue();
+      if (configIssue) {
+        setError(`Configuration Supabase manquante : ${configIssue}`);
+        setLoading(false);
+        return;
+      }
+
       const supabase = getSupabaseClient();
 
       const { data, error: authError } = await supabase.auth.signInWithPassword({
